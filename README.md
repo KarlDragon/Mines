@@ -7,7 +7,7 @@ Return: 2D array (rows x cols)
 - Ô có bom = -1
 - Ô trống = 0
 
-2. Tính số bom lân cận ( Nhận array từ hàm tạo map rồi return lại ) ( Toán ) ( branch : feature/bomb-numbers )
+2. Tính số bom lân cận ( Nhận array từ hàm tạo map rồi return lại ) ( Tài ) ( branch : feature/bomb-numbers )
    Function: calculateBombNumbers(board)
   Return: 2D array
 

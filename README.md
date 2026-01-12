@@ -19,7 +19,6 @@ Return: 2D array (rows x cols)
    Tạo 4 mảng 2 chiều, mỗi mảng vs tên lần lượt như bên dưới
   Mỗi ô cần có:
   - isBomb: boolean
-  - value: number (0–8)
   - isRevealed: boolean
   - isFlagged: boolean
     

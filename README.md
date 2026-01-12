@@ -1,5 +1,5 @@
 # Role công việc
-1. Tạo bảng mìn (Bomb Generator) ( Tài ) ( branch : feature/bomb-generator )
+1. Tạo bảng mìn (Bomb Generator) ( Phong ) ( branch : feature/bomb-generator )
 Function: generateBombMap(rows, cols, bombCount)
 Return: 2D array (rows x cols)
 - Random bomb positions
@@ -7,7 +7,7 @@ Return: 2D array (rows x cols)
 - Ô có bom = -1
 - Ô trống = 0
 
-2. Tính số bom lân cận ( Nhận array từ hàm tạo map rồi return lại ) ( Tài ) ( branch : feature/bomb-numbers )
+2. Tính số bom lân cận ( Nhận array từ hàm tạo map rồi return lại ) ( Phong ) ( branch : feature/bomb-numbers )
    Function: calculateBombNumbers(board)
   Return: 2D array
 

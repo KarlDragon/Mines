@@ -1,65 +1,48 @@
-#include <bits/stdc++.h>
 #include <iostream>
+#include <vector>
 using namespace std;
 
-//const int MAX_SIZE = 100;
+//Mang Revealed
+vector<vector<bool>> createRevealed(int row, int column) {
+    return vector<vector<bool>>(row, vector<bool>(column, false));
+}
 
-bool checkIsBomb(int row, int col, bool arr[][]);
-bool checkIsRevealed(int row, int col, bool arr[][]);
-bool checkIsFlagged(int row, int col, bool arr[][]);
+//Mang Flagged
+vector<vector<bool>> createFlagged(int row, int column) {
+    return vector<vector<bool>>(row, vector<bool>(column, false));
+}
+
+//check bom
+bool isBomb(int row, int column, const vector<vector<bool>>& revealedArray) {
+    if (row < 0 || row >= revealedArray.size() ||
+        column < 0 || column >= revealedArray[0].size()) {
+        return false;
+    }
+    return revealedArray[row][column];
+}
+
+//check o 
+bool isRevealed(int row, int column, const vector<vector<bool>>& revealedArray) {
+    if (row < 0 || row >= revealedArray.size() ||
+        column < 0 || column >= revealedArray[0].size()) {
+        return false;
+    }
+    return revealedArray[row][column];
+}
+
+//check cam co
+bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
+    if (row < 0 || row >= flaggedArray.size() ||
+        column < 0 || column >= flaggedArray[0].size()) {
+        return false;
+    }
+    return flaggedArray[row][column];
+}
+
+
 
 int main() {
-    int rows, cols;
-
-    cout << "Nhap so hang : ";
-    cin >> rows;
-    cout << "Nhap so cot : ";
-    cin >> cols;
-    cout << endl;
-    //if (rows <= 0 || rows > MAX_SIZE || cols <= 0 || cols > MAX_SIZE) {
-        //cout << "Kich thuoc khong hop le!\n";
-       // return 1;
-    //}
-    bool isBomb[][];
-    bool isRevealed[][];
-    bool isFlagged[][];
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            isBomb[i][j] = false;
-            isRevealed[i][j] = false;
-            isFlagged[i][j] = false;
-        }
-    }
-
-    //isBomb[2][3] = true;
-    //isRevealed[5][4] = true;
-    //isFlagged[8][13] = true;
-
-    //cout << (checkIsBomb(2, 3, isBomb, rows, cols) ? "TRUE (Dung!)" : "FALSE (Sai!)") << endl;
-   // cout << (checkIsBomb(0, 0, isBomb, rows, cols) ? "TRUE (Dung!)" : "FALSE (Sai!)") << endl;
-    //cout << (checkIsRevealed(5, 4, isRevealed, rows, cols) ? "TRUE (Dung!)" : "FALSE (Sai!)") << endl;
-    //cout << (checkIsRevealed(1, 1, isRevealed, rows, cols) ? "TRUE (Dung!)" : "FALSE (Sai!)") << endl;
-   // cout << (checkIsFlagged(8, 13, isFlagged, rows, cols) ? "TRUE (Dung!)" : "FALSE (Sai!)") << endl;
-    //cout << (checkIsFlagged(0, 4, isFlagged, rows, cols) ? "TRUE (Dung!)" : "FALSE (Sai!)") << endl;
-}
-
-bool checkIsBomb(int row, int col, bool arr[][], int rows, int cols) {
-    if (row < 0 || row >= rows || col < 0 || col >= cols) {
-        return false;
-    }
-    return arr[row][col];
-}
-
-bool checkIsRevealed(int row, int col, bool arr[][], int rows, int cols) {
-    if (row < 0 || row >= rows || col < 0 || col >= cols) {
-        return false;
-    }
-    return arr[row][col];
-}
-
-bool checkIsFlagged(int row, int col, bool arr[][], int rows, int cols) {
-    if (row < 0 || row >= rows || col < 0 || col >= cols) {
-        return false;
-    }
-    return arr[row][col];
+    //tao mang
+    //vector<vector<bool>> revealedArray = createRevealed(5, 5);
+    //vector<vector<bool>> flaggedArray = createFlagged(5, 5);
 }

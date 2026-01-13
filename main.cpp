@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 using namespace std;
-//TODO Tạo bảng mìn
+//TODO Tao bang min
 void generateBombMap(int board[],int rows,int cols,int bombcount)  {
     int  size = rows * cols;
     for (int  i = 0; i < rows * cols; i++){
@@ -13,15 +13,15 @@ void generateBombMap(int board[],int rows,int cols,int bombcount)  {
     if ( bombcount > size) {
         bombcount = size;
     }
-    While ( count < bombcount ) {
+    while ( count < bombcount ) {
         int pos = rand() % size;
-        if (board[pos] == 0) {
-            board[pos] = -1;
-            count++;
-        }
+    }
+    if (board[pos] == 0) {
+        board[pos] = -1;
+        count++;
     }
 }
-// TODO Tính số mìn lân cận
+// TODO Tinh so min lan can
 void calculateBombNumbers(int board[], int rows, int cols) {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
@@ -37,7 +37,7 @@ void calculateBombNumbers(int board[], int rows, int cols) {
                     }
                     int newrow = r + i;
                     int newcol = c + j;
-                    if (newrow >= o && newrow < rows && newcol >= 0 && newcol < cols) {
+                    if (newrow >= 0 && newrow < rows && newcol >= 0 && newcol < cols) {
                         int newindex = newrow * cols + newcol;
                         if (board[newindex] == -1) {
                             bombcount++;

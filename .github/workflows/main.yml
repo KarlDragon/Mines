@@ -1,0 +1,76 @@
+name: Branch Creation Control
+
+on:
+  create:
+
+jobs:
+  validate-branch-creation:
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enforce branch creation rules
+        run: |
+          ACTOR="${{ github.actor }}"
+          BRANCH="${{ github.event.ref }}"
+          REPO="${{ github.repository }}"
+
+          echo "Actor: $ACTOR"
+          echo "Branch: $BRANCH"
+
+          git fetch origin develop main
+
+          # ---------------------------------
+          # Check actor permission
+          # ---------------------------------
+          PERMISSION=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/$REPO/collaborators/$ACTOR/permission \
+            | jq -r '.permission')
+
+          IS_OWNER=false
+          if [[ "$PERMISSION" == "admin" || "$PERMISSION" == "maintain" ]]; then
+            IS_OWNER=true
+          fi
+
+          echo "Is owner: $IS_OWNER"
+
+          # ---------------------------------
+          # Get branch commit SHA
+          # ---------------------------------
+          BRANCH_SHA=$(git rev-parse origin/$BRANCH)
+
+          DELETE=true
+
+          # ---------------------------------
+          # Owner rule: MUST come from develop
+          # ---------------------------------
+          if [ "$IS_OWNER" = true ]; then
+            if git merge-base --is-ancestor origin/develop "$BRANCH_SHA"; then
+              echo "✅ Owner created branch from develop"
+              DELETE=false
+            else
+              echo "❌ Owner created branch NOT from develop"
+            fi
+          else
+            echo "❌ Non-owner is not allowed to create branches"
+          fi
+
+          # ---------------------------------
+          # Delete branch if rule violated
+          # ---------------------------------
+          if [ "$DELETE" = true ]; then
+            echo "🗑 Deleting branch: $BRANCH"
+
+            curl -X DELETE \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/$REPO/git/refs/heads/$BRANCH
+
+            exit 1
+          fi

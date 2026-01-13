@@ -16,12 +16,12 @@ Return: 2D array (rows x cols)
 - Ghi số bom vào ô
 
 3. Trạng thái ô (Cell State)  ( Toán ) ( branch : feature/cell-state )
-   Tạo 4 mảng 2 chiều, mỗi mảng vs tên lần lượt như bên dưới
+   Tạo 3 mảng 2 chiều, mỗi mảng vs tên lần lượt như bên dưới
   Mỗi ô cần có:
   - isBomb: boolean
-  - value: number (0–8)
   - isRevealed: boolean
   - isFlagged: boolean
+    Và 3 hàm để check vị trí vd isBomb(row, column, array) ( return True False )
     
 4. Xử lý click ô  ( An ) ( branch : feature/cell-click )
   Function: handleCellClick(row, col, clickType)

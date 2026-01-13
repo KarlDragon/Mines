@@ -20,9 +20,9 @@ int main() {
         //cout << "Kich thuoc khong hop le!\n";
        // return 1;
     //}
-    bool isBomb[MAX_SIZE][MAX_SIZE];
-    bool isRevealed[MAX_SIZE][MAX_SIZE];
-    bool isFlagged[MAX_SIZE][MAX_SIZE];
+    bool isBomb[][];
+    bool isRevealed[][];
+    bool isFlagged[][];
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             isBomb[i][j] = false;

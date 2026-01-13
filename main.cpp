@@ -22,7 +22,32 @@ void generateBombMap(int board[],int rows,int cols,int bombcount)  {
         }
     }
 }
-
+// TODO Tính số mìn lân cận
+void calculateBombNumbers(int board[], int rows, int cols) {
+    for (int r = 0; r < rows; r++) {
+        int index = r * cols + c;
+        if (board[index] == -1) {
+            continue;
+        }
+        int bombcount = 0;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1;j++) {
+                if (i == 0 && j == 0) {
+                    continue;
+                }
+                int newrow = r + i;
+                int newcol = c + j;
+                if (newrow >= o && newrow < rows && newcol >= 0 && newcol < cols) {
+                    int newindex = newrow * cols + newcol;
+                    if (board[newindex] == -1) {
+                        bombcount++;
+                    }
+                } 
+            }
+        }
+        board[index] = bombcount;
+    }
+}
 int main(){
     return 0;
 }

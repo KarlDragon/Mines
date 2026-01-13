@@ -3,7 +3,8 @@
 #include <ctime>
 using namespace std;
 //TODO Tao bang min
-void generateBombMap(int board[],int rows,int cols,int bombcount)  {
+void generateBombMap(int board[],int rows,int cols,int bombcount)
+{
     int  size = rows * cols;
     for (int  i = 0; i < rows * cols; i++)
     {
@@ -26,7 +27,8 @@ void generateBombMap(int board[],int rows,int cols,int bombcount)  {
 }
 
 // TODO Tinh so min lan can
-void calculateBombNumbers(int board[], int rows, int cols) {
+void calculateBombNumbers(int board[], int rows, int cols) 
+{
     for (int r = 0; r < rows; r++) 
     {
         for (int c = 0; c < cols; c++) 

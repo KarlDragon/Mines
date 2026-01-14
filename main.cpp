@@ -1,9 +1,11 @@
 #include <bits/stdc++.h>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
 using namespace std;
+
 // TODO Tao bang min
-void generateBombMap(int board[],int rows,int cols,int bombcount)  
+void generateBombMap(int board[],int rows,int cols,int bombCount)  
 {
     int size = rows * cols;
     for (int  i = 0; i < rows * cols; i++)
@@ -24,6 +26,7 @@ void generateBombMap(int board[],int rows,int cols,int bombcount)
         }
     }
 }
+
 // TODO Tinh so bom lan can
 void calculateBombNumbers(int board[], int rows, int cols) 
 {
@@ -60,4 +63,49 @@ void calculateBombNumbers(int board[], int rows, int cols)
         }
         board[index] = bombCount;
     }
+}
+
+//Mang Revealed
+vector<vector<bool>> createRevealed(int row, int column) {
+    return vector<vector<bool>>(row, vector<bool>(column, false));
+}
+
+//Mang Flagged
+vector<vector<bool>> createFlagged(int row, int column) {
+    return vector<vector<bool>>(row, vector<bool>(column, false));
+}
+
+//check bom
+bool isBomb(int row, int column, const vector<vector<bool>>& revealedArray) {
+    if (row < 0 || row >= revealedArray.size() ||
+        column < 0 || column >= revealedArray[0].size()) {
+        return false;
+    }
+    return revealedArray[row][column];
+}
+
+//check o 
+bool isRevealed(int row, int column, const vector<vector<bool>>& revealedArray) {
+    if (row < 0 || row >= revealedArray.size() ||
+        column < 0 || column >= revealedArray[0].size()) {
+        return false;
+    }
+    return revealedArray[row][column];
+}
+
+//check cam co
+bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
+    if (row < 0 || row >= flaggedArray.size() ||
+        column < 0 || column >= flaggedArray[0].size()) {
+        return false;
+    }
+    return flaggedArray[row][column];
+}
+
+
+
+int main() {
+    //tao mang
+    //vector<vector<bool>> revealedArray = createRevealed(5, 5);
+    //vector<vector<bool>> flaggedArray = createFlaggArry;
 }

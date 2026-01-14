@@ -60,8 +60,8 @@ void calculateBombNumbers(int board[], int rows, int cols)
                     } 
                 }
             }
+            board[index] = bombCount;
         }
-        board[index] = bombCount;
     }
 }
 //Mang Revealed

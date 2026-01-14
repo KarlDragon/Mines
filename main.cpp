@@ -19,10 +19,10 @@ void generateBombMap(int board[],int rows,int cols,int bombcount)
     while ( count < bombcount ) 
     {
         int pos = rand() % size;
-        if (board[pos] == 0) {
-            board[pos] = -1;
-            count++;
-        }
+    }
+    if (board[pos] == 0) {
+        board[pos] = -1;
+        count++;
     }
 }
 // TODO Tinh so bom lan can

@@ -10,19 +10,18 @@ void generateBombMap(int board[],int rows,int cols,int bombcount)
     {
         board[i] = 0;
     }
-    srand(time(NULL));
     int count = 0;
-    if ( bombcount > size) 
+    if ( bombCount > size) 
     {
-        bombcount = size;
+        bombCount = size;
     }
-    while ( count < bombcount ) 
+    while ( count < bombCount ) 
     {
         int pos = rand() % size;
-    }
-    if (board[pos] == 0) {
-        board[pos] = -1;
-        count++;
+        if (board[pos] == 0) {
+            board[pos] = -1;
+            count++;
+        }
     }
 }
 // TODO Tinh so bom lan can
@@ -37,7 +36,7 @@ void calculateBombNumbers(int board[], int rows, int cols)
             {
                 continue;
             }
-            int bombcount = 0;
+            int bombCount = 0;
             for (int i = -1; i <= 1; i++) 
             {
                 for (int j = -1; j <= 1;j++) 
@@ -53,16 +52,12 @@ void calculateBombNumbers(int board[], int rows, int cols)
                         int newindex = newrow * cols + newcol;
                         if (board[newindex] == -1) 
                         {
-                            bombcount++;
+                            bombCount++;
                         }
                     } 
                 }
             }
         }
-        board[index] = bombcount;
+        board[index] = bombCount;
     }
-}
-
-int main(){
-    return 0;
 }

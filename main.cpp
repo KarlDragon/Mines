@@ -1,8 +1,7 @@
 #include <bits/stdc++.h>
-#include <cstdlib>
-#include <ctime>
-#include <vector>
+
 using namespace std;
+
 //TODO Tao bang min
 vector<vector<int>> generateBombMap(int rows, int cols, int bombCount) {
     vector<vector<int>> board(rows, vector<int>(cols, 0));
@@ -96,6 +95,20 @@ bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
 
 
 int main() {
-    //tao mang
-    //vector<vector<bool>> revealedArray = createRevealed(5, 5);
-    //vector<vector<bool>> flaggedArray = createFlag
+    // Khong thay doi cac bien sau
+    const int ROWS = 10;
+    const int COLS = 10;
+    const int BOMB_COUNT = 15;
+
+    //tao mang 
+    vector<vector<bool>> revealedArray = createRevealed(ROWS, COLS);
+    vector<vector<bool>> flaggedArray = createFlagged(ROWS, COLS);
+    
+    // Mang chua tinh so bom 
+    vector<vector<int>> bombMap = generateBombMap(ROWS, COLS, BOMB_COUNT);
+
+    // Mang da tinh so bom lan can
+    vector<vector<int>> bombNumbers = calculateBombNumbers(bombMap);
+
+    return 0;
+}

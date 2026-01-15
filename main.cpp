@@ -98,6 +98,13 @@ int main() {
     //tao mang
     //vector<vector<bool>> revealedArray = createRevealed(5, 5);
     //vector<vector<bool>> flaggedArray = createFlag
-    
+    vector<vector<int>> bombMap = generateBombMap(10, 10, 10);
+    vector<vector<int>> calculatedMap = calculateBombNumbers(bombMap);
+    for ( int i = 0; i < calculatedMap.size(); i++) {
+        for ( int j = 0; j < calculatedMap[0].size(); j++) {
+            cout << calculatedMap[i][j] << " ";
+        }
+        cout << endl;
+    }
     return 0;
 }

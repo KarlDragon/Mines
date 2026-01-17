@@ -52,13 +52,13 @@ Return: 2D array (rows x cols)
   
   - Không mở ô có cờ
     
-6. Điều kiện thắng/thua  ( Khôi ) ( branch : feature/win-lose )
+6. Điều kiện thắng/thua  ( Phong ) ( branch : feature/win-lose )
   Thua:
     - Click vào bom
   Thắng:
     - Tất cả ô KHÔNG phải bom đã được mở
       
-7. Giao diện ( UI ) ( Khôi + Toán ) ( branch : feature/ui-basic )
+7. Giao diện ( UI ) ( Phong + Toán ) ( branch : feature/ui-basic )
   Hiển thị:
   - Bảng ô click được
   - Thời gian chơi

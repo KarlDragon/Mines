@@ -58,7 +58,7 @@ Return: 2D array (rows x cols)
   Thắng:
     - Tất cả ô KHÔNG phải bom đã được mở
       
-7. Giao diện ( UI ) ( Phong + Toán ) ( branch : feature/ui-basic )
+7. Giao diện ( UI ) ( Phong ) ( branch : feature/ui-basic )
   Hiển thị:
   - Bảng ô click được
   - Thời gian chơi

@@ -1,8 +1,9 @@
 #include <bits/stdc++.h>
+#include <windows.h>
 
 using namespace std;
 
-//TODO Tao bang min
+// TODO Tao bang min
 vector<vector<int>> generateBombMap(int rows, int cols, int bombCount) {
     vector<vector<int>> board(rows, vector<int>(cols, 0));
 
@@ -92,7 +93,9 @@ bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
     return flaggedArray[row][column];
 }
 
+void UI(){
 
+}
 
 int main() {
     // Khong thay doi cac bien sau
@@ -110,5 +113,6 @@ int main() {
     // Mang da tinh so bom lan can
     vector<vector<int>> bombNumbers = calculateBombNumbers(bombMap);
 
+    UI();
     return 0;
 }

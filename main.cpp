@@ -115,7 +115,7 @@ bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
 }
 //mo rong o
 void revealEmptyCells(int row,int col, vector<vector<int>>& bombNumbers, vector<vector<bool>>& revealedArray,int ROWS,int COLS){
- //  if row<0||row>=ROWS||col<0||col>=COLS) return; //input bang nhap toa do thi moi dung cai phan nay
+   if row<0||row>=ROWS||col<0||col>=COLS) return;
     if(revealedArray[row][col])
         return;
     revealedArray[row][col]=true;

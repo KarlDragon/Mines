@@ -114,17 +114,17 @@ bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
     return flaggedArray[row][column];
 }
 //mo rong o
-void revealEmptyCells(int row,int col, vector<vector<int>>& bombNumbers, vector<vector<bool>>& revealedArray,int ROWS,int COLS){
-    if(row<0||row>=ROWS||col<0||col>=COLS) return;
-    if(revealedArray[row][col])
+void revealEmptyCells(int currentRow,int currentColumn, vector<vector<int>>& bombNumbers, vector<vector<bool>>& revealedArray,int ROWS,int COLS){
+    if (currentRow<0||currentRow>=ROWS||currentColumn<0||currentColumn>=COLS) return;
+    if(revealedArray[currentRow][currentColumn])
         return;
-    revealedArray[row][col]=true;
-    if(bombNumbers[row][col]!=0)
+    revealedArray[currentRow][currentColumn]=true;
+    if(bombNumbers[currentRow][currentColumn]!=0)
         return;
     int dx[8] = {-1,-1,-1,0,0,1,1,1};
     int dy[8] = {-1,-1,-1,0,0,1,1,1};
     for (int k=0;k<8;k++){
-        revealEmptyCells(row+dx[k],col+dy[k],bombNumbers,revealedArray,ROWS,COLS);
+        revealEmptyCells(currentRow+dx[k],currentColumn+dy[k],bombNumbers,revealedArray,ROWS,COLS);
     }
 
 }

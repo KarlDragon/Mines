@@ -126,7 +126,6 @@ void revealEmptyCells(int currentRow,int currentColumn, vector<vector<int>>& bom
     for (int k=0;k<8;k++){
         revealEmptyCells(currentRow+dx[k],currentColumn+dy[k],bombNumbers,revealedArray,ROWS,COLS);
     }
-
 }
 
 
@@ -203,7 +202,6 @@ LRESULT CALLBACK WindowProc(
     // case ve window
     case WM_PAINT:
     {
-
         PAINTSTRUCT ps;
         // hdc = "bút vẽ" của window
         HDC hdc = BeginPaint(hwnd, &ps);
@@ -216,7 +214,6 @@ LRESULT CALLBACK WindowProc(
 
         // Kết thúc vẽ
         EndPaint(hwnd, &ps);
-
         return 0;
     }
     // case xu ly timer
@@ -304,7 +301,6 @@ int WINAPI WinMain(
     {
         // Chuyen thong diep
         TranslateMessage(&msg);
-
         // Gui thong diep den ham xu ly su kien
         DispatchMessage(&msg);
     }

@@ -15,11 +15,11 @@ int WINDOW_WIDTH;
 int WINDOW_HEIGHT;
 int elapsedSeconds;
 UINT_PTR timerId;
-//tao mang 
+//tao mang
 vector<vector<bool>> revealedArray;
 vector<vector<bool>> flaggedArray;
 
-// Mang chua tinh so bom 
+// Mang chua tinh so bom
 vector<vector<int>> bombMap;
 // Mang da tinh so bom lan can
 vector<vector<int>> bombNumbers;
@@ -96,7 +96,7 @@ bool isBomb(int row, int column, const vector<vector<bool>>& revealedArray) {
     return revealedArray[row][column];
 }
 
-//check o 
+//check o
 bool isRevealed(int row, int column, const vector<vector<bool>>& revealedArray) {
     if (row < 0 || row >= revealedArray.size() ||
         column < 0 || column >= revealedArray[0].size()) {
@@ -113,6 +113,22 @@ bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
     }
     return flaggedArray[row][column];
 }
+//mo rong o
+void revealEmptyCells(int currentRow,int currentColumn, vector<vector<int>>& bombNumbers, vector<vector<bool>>& revealedArray,int ROWS,int COLS){
+    if (currentRow<0||currentRow>=ROWS||currentColumn<0||currentColumn>=COLS) return;
+    if(revealedArray[currentRow][currentColumn])
+        return;
+    revealedArray[currentRow][currentColumn]=true;
+    if(bombNumbers[currentRow][currentColumn]!=0)
+        return;
+    int dx[8] = {-1,-1,-1,0,0,1,1,1};
+    int dy[8] = {-1,0,1,-1,1,-1,0,1};
+    for (int k=0;k<8;k++){
+        revealEmptyCells(currentRow+dx[k],currentColumn+dy[k],bombNumbers,revealedArray,ROWS,COLS);
+    }
+    //gei
+}
+
 
 // khoi tao game
 void gameInit(){
@@ -187,7 +203,6 @@ LRESULT CALLBACK WindowProc(
     // case ve window
     case WM_PAINT:
     {
-        
         PAINTSTRUCT ps;
         // hdc = "bút vẽ" của window
         HDC hdc = BeginPaint(hwnd, &ps);
@@ -200,7 +215,6 @@ LRESULT CALLBACK WindowProc(
 
         // Kết thúc vẽ
         EndPaint(hwnd, &ps);
-        
         return 0;
     }
     // case xu ly timer
@@ -281,14 +295,13 @@ int WINAPI WinMain(
     // khoi dong timer
     SetTimer(hwnd, timerId, 1000, NULL);
     // Cap nhat window
-    UpdateWindow(hwnd); 
+    UpdateWindow(hwnd);
     // Chuong trinh chinh cua message loop
     MSG msg = {};
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         // Chuyen thong diep
         TranslateMessage(&msg);
-        
         // Gui thong diep den ham xu ly su kien
         DispatchMessage(&msg);
     }

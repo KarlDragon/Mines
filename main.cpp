@@ -122,10 +122,11 @@ void revealEmptyCells(int currentRow,int currentColumn, vector<vector<int>>& bom
     if(bombNumbers[currentRow][currentColumn]!=0)
         return;
     int dx[8] = {-1,-1,-1,0,0,1,1,1};
-    int dy[8] = {-1,-1,-1,0,0,1,1,1};
+    int dy[8] = {-1,0,1,-1,1,-1,0,1};
     for (int k=0;k<8;k++){
         revealEmptyCells(currentRow+dx[k],currentColumn+dy[k],bombNumbers,revealedArray,ROWS,COLS);
     }
+    //gei
 }
 
 

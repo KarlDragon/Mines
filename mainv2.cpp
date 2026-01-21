@@ -15,6 +15,8 @@ int WINDOW_WIDTH;
 int WINDOW_HEIGHT;
 int elapsedSeconds;
 UINT_PTR timerId;
+bool GAME_OVER = false;
+HWND g_hwnd = NULL;
 //tao mang
 vector<vector<bool>> revealedArray;
 vector<vector<bool>> flaggedArray;
@@ -159,20 +161,6 @@ void handleCellClick(int row, int col, int clickType) {
         }
     }
 }
-// kiem tra thang
-void checkthang() {
-    for (int r = 0; r < ROWS; r++) {
-        for (int c = 0; c < COLS; c++) {
-            // Neu o khong phai bom ma chua mo -> chua thang
-            if (bombMap[r][c] != -1 && !revealedArray[r][c]) {
-                return;
-            }
-        }
-    }
-    // Mo het o khong phai bom -> thang
-    GAME_WIN = true;
-    GAME_OVER = true;
-}
 
 // khoi tao game
 void gameInit(){
@@ -198,9 +186,34 @@ void gameInit(){
     flaggedArray = createFlagged(ROWS, COLS);
 }
 
+// Mau cho cac so
+COLORREF getNumberColor(int num) {
+    switch (num) {
+        case 1: return RGB(0, 0, 255);       // Blue
+        case 2: return RGB(0, 128, 0);       // Green
+        case 3: return RGB(255, 0, 0);       // Red
+        case 4: return RGB(0, 0, 128);       // Dark Blue
+        case 5: return RGB(128, 0, 0);       // Dark Red
+        case 6: return RGB(0, 128, 128);     // Teal
+        case 7: return RGB(0, 0, 0);         // Black
+        case 8: return RGB(128, 128, 128);   // Gray
+        default: return RGB(0, 0, 0);
+    }
+}
+
 // ve bang min
 void drawBoard(HDC hdc)
 {
+    // Font cho so
+    HFONT hFont = CreateFont(16, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+                             DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                             DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+
+    // Căn giữa text
+    SetTextAlign(hdc, TA_CENTER | TA_BASELINE);
+    SetBkMode(hdc, TRANSPARENT);
+
     for (int r = 0; r < ROWS; r++)
     {
         for (int c = 0; c < COLS; c++)
@@ -210,9 +223,61 @@ void drawBoard(HDC hdc)
             int x2 = x1 + CELL_SIZE;
             int y2 = y1 + CELL_SIZE;
 
+            // Vẽ khung ô
             Rectangle(hdc, x1, y1, x2, y2);
+
+            // Tô màu nền cho ô đã mở
+            if (revealedArray[r][c]) {
+                HBRUSH hBrush = CreateSolidBrush(RGB(220, 220, 220));
+                HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+                Rectangle(hdc, x1 + 1, y1 + 1, x2 - 1, y2 - 1);
+                SelectObject(hdc, hOldBrush);
+                DeleteObject(hBrush);
+
+                // Vẽ số nếu có bom lân cận
+                if (bombNumbers[r][c] > 0) {
+                    char buffer[8];
+                    sprintf(buffer, "%d", bombNumbers[r][c]);
+                    SetTextColor(hdc, getNumberColor(bombNumbers[r][c]));
+                    TextOutA(hdc, (x1 + x2) / 2, (y1 + y2) / 2 + 5, buffer, strlen(buffer));
+                }
+                // Vẽ bom nếu là ô bom
+                else if (bombMap[r][c] == -1) {
+                    SetTextColor(hdc, RGB(255, 0, 0));
+                    TextOutA(hdc, (x1 + x2) / 2, (y1 + y2) / 2 + 5, "*", 1);
+                }
+            }
+            // Ô chưa mở
+            else {
+                // Tô màu xám
+                HBRUSH hBrush = CreateSolidBrush(RGB(180, 180, 180));
+                HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+                Rectangle(hdc, x1 + 1, y1 + 1, x2 - 1, y2 - 1);
+                SelectObject(hdc, hOldBrush);
+                DeleteObject(hBrush);
+
+                // Vẽ cờ nếu có
+                if (flaggedArray[r][c]) {
+                    SetTextColor(hdc, RGB(255, 0, 0));
+                    TextOutA(hdc, (x1 + x2) / 2, (y1 + y2) / 2 + 5, "F", 1);
+                }
+            }
         }
     }
+
+    // Vẽ thông báo Game Over
+    if (GAME_OVER) {
+        SetTextColor(hdc, RGB(255, 0, 0));
+        HFONT hBigFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+                                    DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                                    DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
+        SelectObject(hdc, hBigFont);
+        TextOutA(hdc, WINDOW_WIDTH / 2, WINDOW_HEIGHT - 40, "GAME OVER! Press to close", 25);
+        DeleteObject(hBigFont);
+    }
+
+    SelectObject(hdc, hOldFont);
+    DeleteObject(hFont);
 }
 // ve thoi gian + so co
 void drawInfo(HDC hdc)
@@ -269,7 +334,8 @@ LRESULT CALLBACK WindowProc(
         InvalidateRect(hwnd, NULL, TRUE); // vẽ lại
         return 0;
     }
-        // Click chuot trai - mo o
+
+    // Click chuot trai - mo o
     case WM_LBUTTONDOWN:
     {
         if (GAME_OVER) return 0;
@@ -325,14 +391,6 @@ LRESULT CALLBACK WindowProc(
         PostQuitMessage(0);
         return 0;
     }
-     // Hien thi thang/thua
-    if (GAME_OVER) {
-    if (GAME_WIN) {
-        TextOutA(hdc, 300, 10, "YOU WIN!", 8);
-    } else {
-        TextOutA(hdc, 300, 10, "YOU LOSE!", 9);
-    }
-}
 
     // Su kien mac dinh
     return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -373,7 +431,7 @@ int WINAPI WinMain(
     HWND hwnd = CreateWindowExA(
         0, // Kieu mo rong cua window
         CLASS_NAME, // Ten lop window
-        "Hello Windows", // Tieu de cua window
+        "Minesweeper", // Tieu de cua window
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, // Kieu cua window ( vd : co thanh tieu de, co the thay doi kich thuoc, ... )
         CW_USEDEFAULT, // Vi tri x cua window
         CW_USEDEFAULT, // Vi tri y cua window
@@ -384,6 +442,9 @@ int WINAPI WinMain(
         hInstance, // Handle cua ung dung
         NULL // Tham so khoi tao ( khong su dung )
     );
+
+    // Lưu window handle vào global
+    g_hwnd = hwnd;
 
     // Kiem tra tao window co thanh cong khong
     if (hwnd == NULL)
@@ -408,4 +469,5 @@ int WINAPI WinMain(
         DispatchMessage(&msg);
     }
 
+    return 0;
 }

@@ -15,7 +15,7 @@ Return: 2D array (rows x cols)
 - Đếm số bom trong 8 ô xung quanh
 - Ghi số bom vào ô
 
-3. Trạng thái ô (Cell State)  ( Toán ) ( branch : feature/cell-state )
+3. Trạng thái ô (Cell State)  ( Phong ) ( branch : feature/cell-state )
    Tạo 2 mảng 2 chiều, mỗi mảng vs tên lần lượt như là Revealed và Flagged
   Mỗi ô cần có:
   - isBomb: boolean

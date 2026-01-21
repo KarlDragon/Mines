@@ -260,6 +260,56 @@ LRESULT CALLBACK WindowProc(
         InvalidateRect(hwnd, NULL, TRUE); // vẽ lại
         return 0;
     }
+         // Click chuot trai - mo o
+    case WM_LBUTTONDOWN:
+    {
+        if (GAME_OVER) return 0;
+
+        int xPos = LOWORD(lParam);
+        int yPos = HIWORD(lParam);
+
+        // Tính toán row, col từ vị trí chuột
+        int col = (xPos - BOARD_OFFSET_X) / CELL_SIZE;
+        int row = (yPos - BOARD_OFFSET_Y) / CELL_SIZE;
+
+        // Kiểm tra xem click có trong bảng không
+        if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+            handleCellClick(row, col, 0);
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        return 0;
+    }
+
+    // Click chuot phai - cam co
+    case WM_RBUTTONDOWN:
+    {
+        if (GAME_OVER) return 0;
+
+        int xPos = LOWORD(lParam);
+        int yPos = HIWORD(lParam);
+
+        int col = (xPos - BOARD_OFFSET_X) / CELL_SIZE;
+        int row = (yPos - BOARD_OFFSET_Y) / CELL_SIZE;
+
+        if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+            // Chỉ cắm cờ khi ô chưa được mở
+            if (!isRevealed(row, col, revealedArray)) {
+                if (isFlagged(row, col, flaggedArray)) {
+                    // Gỡ cờ
+                    flaggedArray[row][col] = false;
+                    FLAG_COUNT++;
+                } else {
+                    // Cắm cờ
+                    if (FLAG_COUNT > 0) {
+                        flaggedArray[row][col] = true;
+                        FLAG_COUNT--;
+                    }
+                }
+                InvalidateRect(hwnd, NULL, TRUE);
+            }
+        }
+        return 0;
+    }
 
     case WM_DESTROY:
         // Khi window bi dong
@@ -340,5 +390,6 @@ int WINAPI WinMain(
         // Gui thong diep den ham xu ly su kien
         DispatchMessage(&msg);
     }
+
 
 }

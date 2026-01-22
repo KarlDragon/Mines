@@ -175,6 +175,52 @@ void checkthang() {
     GAME_OVER = true;
 }
 
+// Ham xu ly click vao o
+void handleCellClick(int row, int col, int clickType) {
+    // Click trai (clickType = 0)
+    if (clickType == 0) {
+        // Neu o da mo hoac co cam co -> bo qua
+        if (isRevealed(row, col, revealedArray) || isFlagged(row, col, flaggedArray)) {
+            return;
+        }
+
+        // Neu la bom -> thua game
+        if (bombMap[row][col] == -1) {
+            GAME_OVER = true;
+            // Mo tat ca cac o
+            for (int r = 0; r < ROWS; r++) {
+                for (int c = 0; c < COLS; c++) {
+                    revealedArray[r][c] = true;
+                }
+            }
+            return;
+        }
+
+        // Neu value > 0 -> mo o
+        if (bombNumbers[row][col] > 0) {
+            revealedArray[row][col] = true;
+        }
+        // Neu value == 0 -> mo o + mo lan cac o xung quanh (flood fill)
+        else if (bombNumbers[row][col] == 0) {
+            revealEmptyCells(row, col, bombNumbers, revealedArray, ROWS, COLS);
+        }
+    }
+}
+// kiem tra thang
+void checkthang() {
+    for (int r = 0; r < ROWS; r++) {
+        for (int c = 0; c < COLS; c++) {
+            // Neu o khong phai bom ma chua mo -> chua thang
+            if (bombMap[r][c] != -1 && !revealedArray[r][c]) {
+                return;
+            }
+        }
+    }
+    // Mo het o khong phai bom -> thang
+    GAME_WIN = true;
+    GAME_OVER = true;
+}
+
 // khoi tao game
 void gameInit(){
     ROWS = 10;
@@ -485,6 +531,56 @@ LRESULT CALLBACK WindowProc(
         InvalidateRect(hwnd, NULL, TRUE); // vẽ lại
         return 0;
     }
+        // Click chuot trai - mo o
+    case WM_LBUTTONDOWN:
+    {
+        if (GAME_OVER) return 0;
+
+        int xPos = LOWORD(lParam);
+        int yPos = HIWORD(lParam);
+
+        // Tính toán row, col từ vị trí chuột
+        int col = (xPos - BOARD_OFFSET_X) / CELL_SIZE;
+        int row = (yPos - BOARD_OFFSET_Y) / CELL_SIZE;
+
+        // Kiểm tra xem click có trong bảng không
+        if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+            handleCellClick(row, col, 0);
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        return 0;
+    }
+
+    // Click chuot phai - cam co
+    case WM_RBUTTONDOWN:
+    {
+        if (GAME_OVER) return 0;
+
+        int xPos = LOWORD(lParam);
+        int yPos = HIWORD(lParam);
+
+        int col = (xPos - BOARD_OFFSET_X) / CELL_SIZE;
+        int row = (yPos - BOARD_OFFSET_Y) / CELL_SIZE;
+
+        if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+            // Chỉ cắm cờ khi ô chưa được mở
+            if (!isRevealed(row, col, revealedArray)) {
+                if (isFlagged(row, col, flaggedArray)) {
+                    // Gỡ cờ
+                    flaggedArray[row][col] = false;
+                    FLAG_COUNT++;
+                } else {
+                    // Cắm cờ
+                    if (FLAG_COUNT > 0) {
+                        flaggedArray[row][col] = true;
+                        FLAG_COUNT--;
+                    }
+                }
+                InvalidateRect(hwnd, NULL, TRUE);
+            }
+        }
+        return 0;
+    }
 <<<<<<< HEAD
          // Click chuot trai - mo o
 =======
@@ -544,6 +640,15 @@ LRESULT CALLBACK WindowProc(
         // Khi window bi dong
         PostQuitMessage(0);
         return 0;
+    }
+     // Hien thi thang/thua
+    if (GAME_OVER) {
+    if (GAME_WIN) {
+        TextOutA(hdc, 300, 10, "YOU WIN!", 8);
+    } else {
+        TextOutA(hdc, 300, 10, "YOU LOSE!", 9);
+    }
+}
     }
      // Hien thi thang/thua
     if (GAME_OVER) {

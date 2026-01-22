@@ -6,10 +6,10 @@
 
 using namespace std;
 // Build code dùng lệnh sau trong terminal:
-// g++ main.cpp -o app -lgdi32 -luser32 
+// g++ main.cpp -o Mines -lgdi32 -luser32 
 // -lgdi32: thư viện đồ họa
 // -luser32: thư viện cửa sổ
-// sau đó mở file app.exe để chạy ứng dụng
+// sau đó mở file Mines.exe để chạy ứng dụng
 
 // tao bien toan cuc
 int ROWS;

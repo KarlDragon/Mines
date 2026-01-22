@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include <bits/stdc++.h>
 #include <windows.h>
 
@@ -16,6 +15,8 @@ int WINDOW_WIDTH;
 int WINDOW_HEIGHT;
 int elapsedSeconds;
 UINT_PTR timerId;
+bool GAME_OVER = false;
+HWND g_hwnd = NULL;
 //tao mang
 vector<vector<bool>> revealedArray;
 vector<vector<bool>> flaggedArray;
@@ -160,234 +161,7 @@ void handleCellClick(int row, int col, int clickType) {
         }
     }
 }
-// kiem tra thang
-void checkthang() {
-    for (int r = 0; r < ROWS; r++) {
-        for (int c = 0; c < COLS; c++) {
-            // Neu o khong phai bom ma chua mo -> chua thang
-            if (bombMap[r][c] != -1 && !revealedArray[r][c]) {
-                return;
-            }
-        }
-    }
-    // Mo het o khong phai bom -> thang
-    GAME_WIN = true;
-    GAME_OVER = true;
-}
 
-// khoi tao game
-void gameInit(){
-    ROWS = 10;
-    COLS = 10;
-    BOMB_COUNT = 5;
-    FLAG_COUNT = BOMB_COUNT;
-    // kich thuoc o
-    CELL_SIZE = 30;
-    // vi tri bang min
-    BOARD_OFFSET_X = 10;
-    BOARD_OFFSET_Y = 50;
-    // tinh kich thuoc window
-    WINDOW_WIDTH = BOARD_OFFSET_X * 2 + COLS * CELL_SIZE;
-    WINDOW_HEIGHT = BOARD_OFFSET_Y * 2 + ROWS * CELL_SIZE;
-    // khoi tao thoi gian
-    elapsedSeconds = 0;
-    timerId = 1;
-    // khoi tao bang min
-    bombMap = generateBombMap(ROWS, COLS, BOMB_COUNT);
-    bombNumbers = calculateBombNumbers(bombMap);
-    revealedArray = createRevealed(ROWS, COLS);
-    flaggedArray = createFlagged(ROWS, COLS);
-}
-
-// code UI
-// Ham xu ly su kien cua window
-
-int main() {
-    // khoi tao game
-    gameInit();
-
-    // test
-    for (const auto& row : bombNumbers) {
-        for (const auto& cell : row) {
-            cout << cell << " ";
-        }
-        cout << endl;
-    }
-
-    revealEmptyCells(2,3,bombNumbers,revealedArray,ROWS,COLS);
-    for (const auto& row : revealedArray) {
-        for (const auto& cell : row) {
-            cout << (cell ? "R " : ". ");
-        }
-        cout << endl;
-    }
-}
-=======
-#include <bits/stdc++.h>
-#include <windows.h>
-
-using namespace std;
-
-// tao bien toan cuc
-int ROWS;
-int COLS;
-int BOMB_COUNT;
-int FLAG_COUNT;
-int CELL_SIZE;
-int BOARD_OFFSET_X;
-int BOARD_OFFSET_Y;
-int WINDOW_WIDTH;
-int WINDOW_HEIGHT;
-int elapsedSeconds;
-UINT_PTR timerId;
-//tao mang 
-vector<vector<bool>> revealedArray;
-vector<vector<bool>> flaggedArray;
-
-// Mang chua tinh so bom 
-vector<vector<int>> bombMap;
-// Mang da tinh so bom lan can
-vector<vector<int>> bombNumbers;
-
-// TODO Tao bang min
-vector<vector<int>> generateBombMap(int rows, int cols, int bombCount) {
-    vector<vector<int>> board(rows, vector<int>(cols, 0));
-
-    srand(time(nullptr));
-    int placedBombs = 0;
-
-    while (placedBombs < bombCount) {
-        int r = rand() % rows;
-        int c = rand() % cols;
-
-        if (board[r][c] == 0) {
-            board[r][c] = -1;
-            placedBombs++;
-        }
-    }
-
-    return board;
-}
-// TODO Tinh so min lan can
-vector<vector<int>> calculateBombNumbers(const vector<vector<int>>& board) {
-    int rows = board.size();
-    int cols = board[0].size();
-
-    vector<vector<int>> result = board;
-
-    int dx[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
-    int dy[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-
-            if (board[i][j] == -1) continue;
-
-            int bombCount = 0;
-
-            for (int k = 0; k < 8; k++) {
-                int ni = i + dx[k];
-                int nj = j + dy[k];
-
-                if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
-                    if (board[ni][nj] == -1) {
-                        bombCount++;
-                    }
-                }
-            }
-
-            result[i][j] = bombCount;
-        }
-    }
-
-    return result;
-}
-//Mang Revealed
-vector<vector<bool>> createRevealed(int row, int column) {
-    return vector<vector<bool>>(row, vector<bool>(column, false));
-}
-
-//Mang Flagged
-vector<vector<bool>> createFlagged(int row, int column) {
-    return vector<vector<bool>>(row, vector<bool>(column, false));
-}
-
-//check bom
-bool isBomb(int row, int column, const vector<vector<bool>>& revealedArray) {
-    if (row < 0 || row >= revealedArray.size() ||
-        column < 0 || column >= revealedArray[0].size()) {
-        return false;
-    }
-    return revealedArray[row][column];
-}
-
-//check o 
-bool isRevealed(int row, int column, const vector<vector<bool>>& revealedArray) {
-    if (row < 0 || row >= revealedArray.size() ||
-        column < 0 || column >= revealedArray[0].size()) {
-        return false;
-    }
-    return revealedArray[row][column];
-}
-
-//check cam co
-bool isFlagged(int row, int column, const vector<vector<bool>>& flaggedArray) {
-    if (row < 0 || row >= flaggedArray.size() ||
-        column < 0 || column >= flaggedArray[0].size()) {
-        return false;
-    }
-    return flaggedArray[row][column];
-}
-//click
-void handleCellClick(int row, int col, int clickType)
-{
-    // kiem tra bien
-    if (row < 0 || row >= ROWS || col < 0 || col >= COLS)
-        return;
-
-    // click trai
-    if (clickType == 0)
-    {
-        // neu o da mo hoac co co thi bo qua
-        if (revealedArray[row][col] || flaggedArray[row][col])
-            return;
-
-        // neu o do la bom thi thua
-        if (bombMap[row][col] == -1)
-        {
-            revealedArray[row][col] = true;
-
-            MessageBoxA(NULL, " ban da thua game!", "GAME OVER", MB_OK);
-            PostQuitMessage(0);
-            return;
-        }
-
-        // neu value>0 thi mo o
-        if (bombNumbers[row][col] > 0)
-        {
-            revealedArray[row][col] = true;
-            return;
-        }
-
-        // neu value==0 thi mo o va mo lan
-        floodFill(row, col);
-    }
-
-    // click phai
-    if (clickType == 1)
-    {
-        // chi cho cam co khi o chua mo
-        if (!revealedArray[row][col] && FLAG_COUNT > 0)
-        {
-            flaggedArray[row][col] = !flaggedArray[row][col];
-
-            if (flaggedArray[row][col])
-                FLAG_COUNT--;
-            else
-                FLAG_COUNT++;
-        }
-    }
-}
 // khoi tao game
 void gameInit(){
     ROWS = 10;
@@ -412,9 +186,34 @@ void gameInit(){
     flaggedArray = createFlagged(ROWS, COLS);
 }
 
+// Mau cho cac so
+COLORREF getNumberColor(int num) {
+    switch (num) {
+        case 1: return RGB(0, 0, 255);       // Blue
+        case 2: return RGB(0, 128, 0);       // Green
+        case 3: return RGB(255, 0, 0);       // Red
+        case 4: return RGB(0, 0, 128);       // Dark Blue
+        case 5: return RGB(128, 0, 0);       // Dark Red
+        case 6: return RGB(0, 128, 128);     // Teal
+        case 7: return RGB(0, 0, 0);         // Black
+        case 8: return RGB(128, 128, 128);   // Gray
+        default: return RGB(0, 0, 0);
+    }
+}
+
 // ve bang min
 void drawBoard(HDC hdc)
 {
+    // Font cho so
+    HFONT hFont = CreateFont(16, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+                             DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                             DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+
+    // Căn giữa text
+    SetTextAlign(hdc, TA_CENTER | TA_BASELINE);
+    SetBkMode(hdc, TRANSPARENT);
+
     for (int r = 0; r < ROWS; r++)
     {
         for (int c = 0; c < COLS; c++)
@@ -424,9 +223,61 @@ void drawBoard(HDC hdc)
             int x2 = x1 + CELL_SIZE;
             int y2 = y1 + CELL_SIZE;
 
+            // Vẽ khung ô
             Rectangle(hdc, x1, y1, x2, y2);
+
+            // Tô màu nền cho ô đã mở
+            if (revealedArray[r][c]) {
+                HBRUSH hBrush = CreateSolidBrush(RGB(220, 220, 220));
+                HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+                Rectangle(hdc, x1 + 1, y1 + 1, x2 - 1, y2 - 1);
+                SelectObject(hdc, hOldBrush);
+                DeleteObject(hBrush);
+
+                // Vẽ số nếu có bom lân cận
+                if (bombNumbers[r][c] > 0) {
+                    char buffer[8];
+                    sprintf(buffer, "%d", bombNumbers[r][c]);
+                    SetTextColor(hdc, getNumberColor(bombNumbers[r][c]));
+                    TextOutA(hdc, (x1 + x2) / 2, (y1 + y2) / 2 + 5, buffer, strlen(buffer));
+                }
+                // Vẽ bom nếu là ô bom
+                else if (bombMap[r][c] == -1) {
+                    SetTextColor(hdc, RGB(255, 0, 0));
+                    TextOutA(hdc, (x1 + x2) / 2, (y1 + y2) / 2 + 5, "*", 1);
+                }
+            }
+            // Ô chưa mở
+            else {
+                // Tô màu xám
+                HBRUSH hBrush = CreateSolidBrush(RGB(180, 180, 180));
+                HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+                Rectangle(hdc, x1 + 1, y1 + 1, x2 - 1, y2 - 1);
+                SelectObject(hdc, hOldBrush);
+                DeleteObject(hBrush);
+
+                // Vẽ cờ nếu có
+                if (flaggedArray[r][c]) {
+                    SetTextColor(hdc, RGB(255, 0, 0));
+                    TextOutA(hdc, (x1 + x2) / 2, (y1 + y2) / 2 + 5, "F", 1);
+                }
+            }
         }
     }
+
+    // Vẽ thông báo Game Over
+    if (GAME_OVER) {
+        SetTextColor(hdc, RGB(255, 0, 0));
+        HFONT hBigFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+                                    DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                                    DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "Arial");
+        SelectObject(hdc, hBigFont);
+        TextOutA(hdc, WINDOW_WIDTH / 2, WINDOW_HEIGHT - 40, "GAME OVER! Press to close", 25);
+        DeleteObject(hBigFont);
+    }
+
+    SelectObject(hdc, hOldFont);
+    DeleteObject(hFont);
 }
 // ve thoi gian + so co
 void drawInfo(HDC hdc)
@@ -461,7 +312,6 @@ LRESULT CALLBACK WindowProc(
     // case ve window
     case WM_PAINT:
     {
-        
         PAINTSTRUCT ps;
         // hdc = "bút vẽ" của window
         HDC hdc = BeginPaint(hwnd, &ps);
@@ -474,7 +324,6 @@ LRESULT CALLBACK WindowProc(
 
         // Kết thúc vẽ
         EndPaint(hwnd, &ps);
-        
         return 0;
     }
     // case xu ly timer
@@ -485,11 +334,8 @@ LRESULT CALLBACK WindowProc(
         InvalidateRect(hwnd, NULL, TRUE); // vẽ lại
         return 0;
     }
-<<<<<<< HEAD
-         // Click chuot trai - mo o
-=======
-        // Click chuot trai - mo o
->>>>>>> 9f8c4f164e472443a143e6b4bc42f62fb3d91b8f
+
+    // Click chuot trai - mo o
     case WM_LBUTTONDOWN:
     {
         if (GAME_OVER) return 0;
@@ -545,14 +391,6 @@ LRESULT CALLBACK WindowProc(
         PostQuitMessage(0);
         return 0;
     }
-     // Hien thi thang/thua
-    if (GAME_OVER) {
-    if (GAME_WIN) {
-        TextOutA(hdc, 300, 10, "YOU WIN!", 8);
-    } else {
-        TextOutA(hdc, 300, 10, "YOU LOSE!", 9);
-    }
-}
 
     // Su kien mac dinh
     return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -588,11 +426,12 @@ int WINAPI WinMain(
         MessageBoxA(NULL, "RegisterClass FAILED", "ERROR", MB_ICONERROR);
         return 0;
     }
+
     // Tao window
     HWND hwnd = CreateWindowExA(
         0, // Kieu mo rong cua window
         CLASS_NAME, // Ten lop window
-        "Hello Windows", // Tieu de cua window
+        "Minesweeper", // Tieu de cua window
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, // Kieu cua window ( vd : co thanh tieu de, co the thay doi kich thuoc, ... )
         CW_USEDEFAULT, // Vi tri x cua window
         CW_USEDEFAULT, // Vi tri y cua window
@@ -603,6 +442,9 @@ int WINAPI WinMain(
         hInstance, // Handle cua ung dung
         NULL // Tham so khoi tao ( khong su dung )
     );
+
+    // Lưu window handle vào global
+    g_hwnd = hwnd;
 
     // Kiem tra tao window co thanh cong khong
     if (hwnd == NULL)
@@ -616,18 +458,16 @@ int WINAPI WinMain(
     // khoi dong timer
     SetTimer(hwnd, timerId, 1000, NULL);
     // Cap nhat window
-    UpdateWindow(hwnd); 
+    UpdateWindow(hwnd);
     // Chuong trinh chinh cua message loop
     MSG msg = {};
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         // Chuyen thong diep
         TranslateMessage(&msg);
-        
         // Gui thong diep den ham xu ly su kien
         DispatchMessage(&msg);
     }
 
-
+    return 0;
 }
->>>>>>> 0335ff242d93152d0a2e512647e5ec808d1bc6fa

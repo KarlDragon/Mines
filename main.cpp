@@ -16,13 +16,14 @@ int ROWS;
 int COLS;
 int BOMB_COUNT;
 int FLAG_COUNT;
-int REMAINING_CELLS;
+int BOMB_LEFT;
+int TIME_LIMIT;
+int TIME_LEFT;
 int CELL_SIZE;
 int BOARD_OFFSET_X;
 int BOARD_OFFSET_Y;
 int WINDOW_WIDTH;
 int WINDOW_HEIGHT;
-int elapsedSeconds;
 int INFO_HEIGHT;
 const int STATE_MENU = 0;
 const int STATE_PLAYING = 1;
@@ -129,7 +130,6 @@ void revealEmptyCells(int currentRow,int currentColumn, vector<vector<int>>& bom
     if(revealedArray[currentRow][currentColumn])
         return;
     revealedArray[currentRow][currentColumn]=true;
-    REMAINING_CELLS--;
     if(bombNumbers[currentRow][currentColumn]!=0)
         return;
     int dx[8] = {-1,-1,-1,0,0,1,1,1};
@@ -150,23 +150,12 @@ void handleCellClick(int row, int col, int clickType) {
         // Neu la bom -> thua game
         if (bombMap[row][col] == -1) {
             gameState = STATE_GAMEOVER;
-            // Mo tat ca cac o
-            for (int r = 0; r < ROWS; r++) {
-                for (int c = 0; c < COLS; c++) {
-                    revealedArray[r][c] = true;
-                }
-            }
             return;
         }
 
         // Neu value > 0 -> mo o
         if (bombNumbers[row][col] > 0) {
             revealedArray[row][col] = true;
-            REMAINING_CELLS--;
-            // Kiem tra thang game
-            if (REMAINING_CELLS == 0) {
-                gameState = STATE_WIN;
-            }
         }
         // Neu value == 0 -> mo o + mo lan cac o xung quanh (flood fill)
         else if (bombNumbers[row][col] == 0) {
@@ -178,7 +167,7 @@ void handleCellClick(int row, int col, int clickType) {
 
 // khoi tao game
 void gameInit(){
-    REMAINING_CELLS = ROWS * COLS - BOMB_COUNT;
+    BOMB_LEFT = BOMB_COUNT;
     FLAG_COUNT = BOMB_COUNT;
     // kich thuoc o
     CELL_SIZE = 30;
@@ -190,7 +179,7 @@ void gameInit(){
     WINDOW_WIDTH = BOARD_OFFSET_X * 2 + COLS * CELL_SIZE;
     WINDOW_HEIGHT = BOARD_OFFSET_Y * 2 + ROWS * CELL_SIZE;
     // khoi tao thoi gian
-    elapsedSeconds = 0;
+    TIME_LEFT = TIME_LIMIT;
     // khoi tao bang min
     bombMap = generateBombMap(ROWS, COLS, BOMB_COUNT);
     bombNumbers = calculateBombNumbers(bombMap);
@@ -226,16 +215,19 @@ void setDifficulty(string level, HWND hwnd)
         ROWS = 9;
         COLS = 9;
         BOMB_COUNT = 10;
+        TIME_LIMIT = 10 * BOMB_COUNT;
     }
     else if (level == "MEDIUM") {
         ROWS = 16;
         COLS = 16;
         BOMB_COUNT = 40;
+        TIME_LIMIT = 8 * BOMB_COUNT;
     }
     else if (level == "HARD") {
         ROWS = 16;
         COLS = 30;
         BOMB_COUNT = 99;
+        TIME_LIMIT = 6 * BOMB_COUNT;
     }
 
     gameState = STATE_PLAYING;
@@ -383,36 +375,40 @@ void drawInfo(HWND hwnd, HDC hdc)
 
     RECT infoRect = { 0, 0, client.right, INFO_HEIGHT };
 
-    // Clear background
-    FillRect(hdc, &infoRect, (HBRUSH)(COLOR_WINDOW + 1));
+    HBRUSH bg = CreateSolidBrush(RGB(255,255,255));
+    FillRect(hdc, &infoRect, bg);
+    DeleteObject(bg);
+
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(255,0,0));
+    SetTextAlign(hdc, TA_LEFT | TA_TOP);
+
+    HFONT hInfoFont = CreateFont(
+        20, 0, 0, 0,
+        FW_BOLD,
+        FALSE, FALSE, FALSE,
+        DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS,
+        CLIP_DEFAULT_PRECIS,
+        DEFAULT_QUALITY,
+        DEFAULT_PITCH | FF_SWISS,
+        "Arial"
+    );
+
+    HFONT oldFont = (HFONT)SelectObject(hdc, hInfoFont);
 
     char buffer[64];
-    // Ve thoi gian
-    RECT timeRect = infoRect;
-    timeRect.right = client.right / 2;
 
-    sprintf(buffer, "Time: %d", elapsedSeconds);
+    sprintf(buffer, "Time: %d", TIME_LEFT);
+    TextOutA(hdc, 10, 8, buffer, strlen(buffer));
 
-    DrawTextA(
-        hdc,
-        buffer,
-        -1,
-        &timeRect,
-        DT_CENTER | DT_VCENTER | DT_SINGLELINE
-    );
-    // Ve so co
-    RECT flagRect = infoRect;
-    flagRect.left = client.right / 2;
+    sprintf(buffer, "Flag: %d", FLAG_COUNT);
+    SIZE sz;
+    GetTextExtentPoint32A(hdc, buffer, strlen(buffer), &sz);
+    TextOutA(hdc, client.right - sz.cx - 10, 8, buffer, strlen(buffer));
 
-    sprintf(buffer, "Flags: %d", FLAG_COUNT);
-
-    DrawTextA(
-        hdc,
-        buffer,
-        -1,
-        &flagRect,
-        DT_CENTER | DT_VCENTER | DT_SINGLELINE
-    );
+    SelectObject(hdc, oldFont);
+    DeleteObject(hInfoFont);
 }
 
 void drawGameOver(HWND hwnd, HDC hdc){
@@ -550,7 +546,11 @@ LRESULT CALLBACK WindowProc(
     case WM_TIMER:
         // Cập nhật thời gian chơi
         if (gameState == STATE_PLAYING) {
-            elapsedSeconds++;
+            if (TIME_LEFT > 0) {
+                TIME_LEFT--;
+            } else {
+                gameState = STATE_GAMEOVER;
+            }
             InvalidateRect(hwnd, NULL, TRUE);
         }
     return 0;
@@ -650,6 +650,12 @@ LRESULT CALLBACK WindowProc(
                     if (FLAG_COUNT > 0) {
                         flaggedArray[row][col] = true;
                         FLAG_COUNT--;
+                        if (bombMap[row][col] == -1) {
+                            BOMB_LEFT--;
+                            if (BOMB_LEFT == 0) {
+                                gameState = STATE_WIN;
+                            }
+                        }
                     }
                 }
                 InvalidateRect(hwnd, NULL, TRUE);

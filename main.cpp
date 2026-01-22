@@ -6,10 +6,10 @@
 
 using namespace std;
 // Build code dùng lệnh sau trong terminal:
-// g++ main.cpp -o app -lgdi32 -luser32 
+// g++ main.cpp -o Mines -lgdi32 -luser32 
 // -lgdi32: thư viện đồ họa
 // -luser32: thư viện cửa sổ
-// sau đó mở file app.exe để chạy ứng dụng
+// sau đó mở file Mines.exe để chạy ứng dụng
 
 // tao bien toan cuc
 int ROWS;
@@ -19,6 +19,7 @@ int FLAG_COUNT;
 int BOMB_LEFT;
 int TIME_LIMIT;
 int TIME_LEFT;
+bool FIRST_CLICK;
 int CELL_SIZE;
 int BOARD_OFFSET_X;
 int BOARD_OFFSET_Y;
@@ -45,7 +46,7 @@ vector<vector<int>> bombMap;
 vector<vector<int>> bombNumbers;
 
 // TODO Tao bang min
-vector<vector<int>> generateBombMap(int rows, int cols, int bombCount) {
+vector<vector<int>> generateBombMap(int rows, int cols, int bombCount, int firstClickRow, int firstClickCol) {
     vector<vector<int>> board(rows, vector<int>(cols, 0));
 
     srand(time(nullptr));
@@ -55,12 +56,12 @@ vector<vector<int>> generateBombMap(int rows, int cols, int bombCount) {
         int r = rand() % rows;
         int c = rand() % cols;
 
-        if (board[r][c] == 0) {
+        if (board[r][c] == 0 && !(r == firstClickRow && c == firstClickCol)) {
             board[r][c] = -1;
             placedBombs++;
         }
     }
-
+    FIRST_CLICK = false;
     return board;
 }
 // TODO Tinh so min lan can
@@ -169,6 +170,7 @@ void handleCellClick(int row, int col, int clickType) {
 void gameInit(){
     BOMB_LEFT = BOMB_COUNT;
     FLAG_COUNT = BOMB_COUNT;
+    FIRST_CLICK = true;
     // kich thuoc o
     CELL_SIZE = 30;
     INFO_HEIGHT = 40;
@@ -180,9 +182,7 @@ void gameInit(){
     WINDOW_HEIGHT = BOARD_OFFSET_Y * 2 + ROWS * CELL_SIZE;
     // khoi tao thoi gian
     TIME_LEFT = TIME_LIMIT;
-    // khoi tao bang min
-    bombMap = generateBombMap(ROWS, COLS, BOMB_COUNT);
-    bombNumbers = calculateBombNumbers(bombMap);
+    // khoi tao mang
     revealedArray = createRevealed(ROWS, COLS);
     flaggedArray = createFlagged(ROWS, COLS);
 }
@@ -520,40 +520,80 @@ LRESULT CALLBACK WindowProc(
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
-        // hdc = "bút vẽ" của window
         HDC hdc = BeginPaint(hwnd, &ps);
+
+        RECT client;
+        // Lay kich thuoc vung ve cua window
+        GetClientRect(hwnd, &client);
+
+        // Tao memory DC (ve vao bo nho truoc)
+        HDC memDC = CreateCompatibleDC(hdc);
+        // Tao bitmap tuong thich voi HDC that
+        HBITMAP memBitmap = CreateCompatibleBitmap(
+            hdc,
+            client.right,
+            client.bottom
+        );
+        // Gan bitmap vao memDC de ve
+        HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, memBitmap);
+
+        // vẽ toàn bộ vào memDC
+        FillRect(memDC, &client, (HBRUSH)(COLOR_WINDOW + 1));
+
         switch (gameState) {
             case STATE_MENU:
-                drawMenu(hwnd, hdc);
+                drawMenu(hwnd, memDC);
                 break;
             case STATE_PLAYING:
-                drawBoard(hdc);
-                drawInfo(hwnd, hdc);
+                drawBoard(memDC);
+                drawInfo(hwnd, memDC);
                 break;
             case STATE_GAMEOVER:
-                drawGameOver(hwnd, hdc);
+                drawGameOver(hwnd, memDC);
                 break;
             case STATE_WIN:
-                drawWin(hwnd, hdc);
+                drawWin(hwnd, memDC);
                 break;
         }
 
-        // Kết thúc vẽ
+        // copy lên màn hình
+        BitBlt(
+            hdc,
+            0, 0,
+            client.right,
+            client.bottom,
+            memDC,
+            0, 0,
+            SRCCOPY
+        );
+
+        // Dọn dẹp bộ nhớ
+        SelectObject(memDC, oldBitmap);
+        DeleteObject(memBitmap);
+        DeleteDC(memDC);
+
         EndPaint(hwnd, &ps);
         return 0;
     }
+
     // case xu ly timer
     case WM_TIMER:
-        // Cập nhật thời gian chơi
+    {
         if (gameState == STATE_PLAYING) {
-            if (TIME_LEFT > 0) {
+            if (TIME_LEFT > 0)
                 TIME_LEFT--;
-            } else {
+            else
                 gameState = STATE_GAMEOVER;
-            }
-            InvalidateRect(hwnd, NULL, TRUE);
+
+            RECT infoRect;
+            GetClientRect(hwnd, &infoRect);
+            infoRect.bottom = INFO_HEIGHT;
+
+            InvalidateRect(hwnd, &infoRect, FALSE);
         }
-    return 0;
+        return 0;
+    }
+
 
         // Click chuot trai - mo o
     case WM_LBUTTONDOWN:
@@ -588,6 +628,10 @@ LRESULT CALLBACK WindowProc(
 
                 // Kiểm tra xem click có trong bảng không
                 if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+                    if (FIRST_CLICK){
+                        bombMap = generateBombMap(ROWS, COLS, BOMB_COUNT, row, col);
+                        bombNumbers = calculateBombNumbers(bombMap);
+                    }
                     handleCellClick(row, col, 0);
                     InvalidateRect(hwnd, NULL, TRUE);
                 }
@@ -663,6 +707,8 @@ LRESULT CALLBACK WindowProc(
         }
         return 0;
     }
+
+    case WM_ERASEBKGND: return 1; // không cho Windows xóa nền
 
     case WM_DESTROY:
         // Khi window bi dong

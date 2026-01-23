@@ -3,7 +3,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <string>
-
+#include <fstream>
 using namespace std;
 // Build code dùng lệnh sau trong terminal:
 // g++ main.cpp -o Mines -lgdi32 -luser32 
@@ -34,7 +34,7 @@ const int STATE_WIN = 3;
 int gameState;
 
 // Button RECT
-RECT btnEasy, btnMedium, btnHard, btnRestart, btnMenu;
+RECT btnEasy, btnMedium, btnHard, btnCustom, btnRestart, btnMenu;
 
 //tao mang
 vector<vector<bool>> revealedArray;
@@ -61,6 +61,7 @@ vector<vector<int>> generateBombMap(int rows, int cols, int bombCount, int first
             placedBombs++;
         }
     }
+
     FIRST_CLICK = false;
     return board;
 }
@@ -96,6 +97,14 @@ vector<vector<int>> calculateBombNumbers(const vector<vector<int>>& board) {
         }
     }
 
+    ofstream out("MINES.OUT");
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            out << result[i][j] << " ";
+        }
+        out << "\n";
+    }
+    out.close();
     return result;
 }
 //Mang Revealed
@@ -229,7 +238,13 @@ void setDifficulty(string level, HWND hwnd)
         BOMB_COUNT = 99;
         TIME_LIMIT = 6 * BOMB_COUNT;
     }
-
+    else if (level == "CUSTOM") {
+        ifstream INP("MINES.INP");
+        if (INP.is_open()) {
+            INP >> ROWS >> COLS >> BOMB_COUNT >> TIME_LIMIT;
+        }
+        INP.close();
+    }
     gameState = STATE_PLAYING;
     gameInit();
 
@@ -286,6 +301,7 @@ void drawMenu(HWND hwnd, HDC hdc)
     btnEasy = { centerX, 120, centerX + btnWidth, 160 };
     btnMedium = { centerX, 180, centerX + btnWidth, 220 };
     btnHard = { centerX, 240, centerX + btnWidth, 280 };
+    btnCustom = { centerX, 300, centerX + btnWidth, 340 };
 
     Rectangle(hdc, btnEasy.left, btnEasy.top, btnEasy.right, btnEasy.bottom);
     DrawTextA(hdc, "Easy", -1, &btnEasy, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -296,6 +312,8 @@ void drawMenu(HWND hwnd, HDC hdc)
     Rectangle(hdc, btnHard.left, btnHard.top, btnHard.right, btnHard.bottom);
     DrawTextA(hdc, "Hard", -1, &btnHard, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
+    Rectangle(hdc, btnCustom.left, btnCustom.top, btnCustom.right, btnCustom.bottom);
+    DrawTextA(hdc, "Custom", -1, &btnCustom, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
     SelectObject(hdc, oldFont);
     DeleteObject(hTitleFont);
 
@@ -615,6 +633,10 @@ LRESULT CALLBACK WindowProc(
                     setDifficulty("HARD", hwnd);
                     InvalidateRect(hwnd, NULL, TRUE);
                 }
+                else if (PtInRect(&btnCustom, p)) {
+                    setDifficulty("CUSTOM", hwnd);
+                    InvalidateRect(hwnd, NULL, TRUE);
+                }
                 break;
             }
             case STATE_PLAYING:
@@ -731,7 +753,7 @@ int WINAPI WinMain(
     // Khoi tao game
     gameState = STATE_MENU;
     WINDOW_WIDTH = 400;
-    WINDOW_HEIGHT = 350;
+    WINDOW_HEIGHT = 400;
 
     // Dang ky lop cua window
     // Ten lop window

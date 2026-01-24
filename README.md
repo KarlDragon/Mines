@@ -15,7 +15,7 @@ Return: 2D array (rows x cols)
 - Đếm số bom trong 8 ô xung quanh
 - Ghi số bom vào ô
 
-3. Trạng thái ô (Cell State)  ( Toán ) ( branch : feature/cell-state )
+3. Trạng thái ô (Cell State)  ( Phong ) ( branch : feature/cell-state )
    Tạo 2 mảng 2 chiều, mỗi mảng vs tên lần lượt như là Revealed và Flagged
   Mỗi ô cần có:
   - isBomb: boolean
@@ -52,7 +52,7 @@ Return: 2D array (rows x cols)
   
   - Không mở ô có cờ
     
-6. Điều kiện thắng/thua  ( Phong ) ( branch : feature/win-lose )
+6. Điều kiện thắng/thua  ( An ) ( branch : feature/win-lose )
   Thua:
     - Click vào bom
   Thắng:
@@ -66,7 +66,7 @@ Return: 2D array (rows x cols)
   - Số cờ còn lại
   - Màn hình thắng / thua
 
-8. Reset game  ( An ) ( branch : feature/reset-game )
+8. Reset game  ( Phong ) ( branch : feature/reset-game )
 Function: resetGame()
   - Tạo lại board
   - Reset timer

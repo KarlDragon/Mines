@@ -25,6 +25,8 @@ int BOARD_OFFSET_X;
 int BOARD_OFFSET_Y;
 int WINDOW_WIDTH;
 int WINDOW_HEIGHT;
+int MENU_WIDTH;
+int MENU_HEIGHT;
 int INFO_HEIGHT;
 const int STATE_MENU = 0;
 const int STATE_PLAYING = 1;
@@ -200,9 +202,9 @@ void gameInit(){
 }
 
 // resize window
-void resizeWindowToBoard(HWND hwnd)
+void resizeWindowToBoard(HWND hwnd, int width, int height)
 {
-    RECT rect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+    RECT rect = { 0, 0, width, height };
 
     // Tinh kich thuoc window chua ca khung
     AdjustWindowRect(
@@ -251,7 +253,7 @@ void setDifficulty(string level, HWND hwnd)
     gameState = STATE_PLAYING;
     gameInit();
 
-    resizeWindowToBoard(hwnd);
+    resizeWindowToBoard(hwnd, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 // Mau cho cac so
@@ -673,6 +675,7 @@ LRESULT CALLBACK WindowProc(
                     InvalidateRect(hwnd, NULL, TRUE);
                 }
                 else if (PtInRect(&btnMenu, p)) {
+                    resizeWindowToBoard(hwnd, MENU_WIDTH, MENU_HEIGHT);
                     gameState = STATE_MENU;
                     InvalidateRect(hwnd, NULL, TRUE);
                 }
@@ -757,8 +760,8 @@ int WINAPI WinMain(
 {
     // Khoi tao game
     gameState = STATE_MENU;
-    WINDOW_WIDTH = 400;
-    WINDOW_HEIGHT = 400;
+    MENU_WIDTH = 400;
+    MENU_HEIGHT = 400;
 
     // Dang ky lop cua window
     // Ten lop window
@@ -790,8 +793,8 @@ int WINAPI WinMain(
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, // Kieu cua window ( vd : co thanh tieu de, co the thay doi kich thuoc, ... )
         CW_USEDEFAULT, // Vi tri x cua window
         CW_USEDEFAULT, // Vi tri y cua window
-        WINDOW_WIDTH, // Chieu rong cua window
-        WINDOW_HEIGHT, // Chieu cao cua window
+        MENU_WIDTH, // Chieu rong cua window
+        MENU_HEIGHT, // Chieu cao cua window
         NULL, // Handle cua window cha ( NULL neu la window chinh )
         NULL, // Handle cua menu ( NULL neu khong co menu )
         hInstance, // Handle cua ung dung

@@ -44,7 +44,7 @@ vector<vector<bool>> flaggedArray;
 vector<vector<int>> bombMap;
 // Mang da tinh so bom lan can
 vector<vector<int>> bombNumbers;
-// kiem tra vung 3x3 cua o dc click dau tien co bom hay khong 
+// Kiem tra vung 3x3 cua o dc click dau tien co bom hay khong
 bool isInSafeZone(int r, int c, int firstClickRow, int firstClickCol) {
     return abs(r - firstClickRow) <= 1 && abs(c - firstClickCol) <= 1;
 }

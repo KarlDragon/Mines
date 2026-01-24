@@ -44,7 +44,10 @@ vector<vector<bool>> flaggedArray;
 vector<vector<int>> bombMap;
 // Mang da tinh so bom lan can
 vector<vector<int>> bombNumbers;
-
+// kiem tra xung quanh co bom hay so
+bool isInSafeZone(int r, int c, int firstClickRow, int firstClickCol) {
+    return abs(r - firstClickRow) <= 1 && abs(c - firstClickCol) <= 1;
+}
 // TODO Tao bang min
 vector<vector<int>> generateBombMap(int rows, int cols, int bombCount, int firstClickRow, int firstClickCol) {
     vector<vector<int>> board(rows, vector<int>(cols, 0));
@@ -56,7 +59,7 @@ vector<vector<int>> generateBombMap(int rows, int cols, int bombCount, int first
         int r = rand() % rows;
         int c = rand() % cols;
 
-        if (board[r][c] == 0 && !(r == firstClickRow && c == firstClickCol)) {
+        if ((board[r][c] == 0 && !(r == firstClickRow && c == firstClickCol))&&  !isInSafeZone(r, c, firstClickRow, firstClickCol)) {
             board[r][c] = -1;
             placedBombs++;
         }
@@ -552,6 +555,8 @@ LRESULT CALLBACK WindowProc(
             client.right,
             client.bottom
         );
+        
+
         // Gan bitmap vao memDC de ve
         HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, memBitmap);
 
